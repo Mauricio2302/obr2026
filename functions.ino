@@ -13,6 +13,20 @@ void backward(int speed){
   analogWrite(IN3, 0);
   analogWrite(IN4, speed);
 }
+void right(int speed){
+  //função pro robô andar para trás
+  analogWrite(IN1, 0);
+  analogWrite(IN2, speed);
+  analogWrite(IN3, speed);
+  analogWrite(IN4, 0);
+}
+void left(int speed){
+  //função pro robô andar para trás
+  analogWrite(IN1, speed);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, 0);
+  analogWrite(IN4, speed);
+}
 
 void readColors(){
   //função para atualizar a leitura dos sensores de cor
@@ -52,17 +66,70 @@ void readLine(){
   // esquerda = -3
   // a fórmula calcula a posição média da linha
   error = (s1*3 + s2*1 + s3*(-1) + s4*(-3)) / (float)soma;
+  /*if(s1 == 1 && s2 == 1){
+    forward(100);
+    delay(200);
+    right(120);
+    delay(300);
+    while(sensor3.getColor() != 1){
+      readColors();
+      right(120);
+    }
+    /*left(100);
+    delay(300);
+  }
+  if(s3 == 1 && s4 == 1){
+    forward(100);
+    delay(200);
+    left(120);
+    delay(300);
+    while(sensor2.getColor() != 1){
+      readColors();
+      left(120);
+    }
+    /*right(100);
+    delay(300);
+  }*/
 }
 
 void followLine(){
-  //função para aplicar ou reduzir velocidade nos motores para seguir linha
 
+  /*if(hasGreen()){
+
+    // decide lado antes de andar
+    bool leftSide  = greenLeft();
+    bool rightSide = greenRight();
+
+    forward(100);
+    delay(150);
+
+    if(leftSide){
+      left(150);
+      delay(600);
+
+      while(sensor2.getColor() != 1){
+        left(120);
+      }
+    }
+    else if(rightSide){
+      right(150);
+      delay(600);
+
+      while(sensor3.getColor() != 1){
+        right(120);
+      }
+    }
+
+    return; // sai da função depois de resolver verde
+  }*/
+
+  // se não tem verde, segue linha normal
   readLine();
 
   P = Kp * error;            
-  P = constrain(P, -90, 90); // limita correção para não fazer curva muito fechada
+  P = constrain(P, -150, 150);
 
-  int baseSpeed = 140;
+  int baseSpeed = 100;
 
   int leftSpeed  = baseSpeed - P;
   int rightSpeed = baseSpeed + P;
@@ -76,41 +143,61 @@ void followLine(){
   analogWrite(IN4, 0);
 }
 
-bool isGreen(ColorSensor &s) {
-  //função para retornar se a cor lida pelo sensor é verde
-  int color = s.getColor();
-  if (color == 3) { 
+bool isGreen(ColorSensor &s, float margem){
+  s.getRGB();
+
+  int r = s.R_raw;
+  int g = s.G_raw;
+  int b = s.B_raw;
+
+  if(margem == 3){
+    if((g > 40 && g < 65) && (r > 35 && r < 65) && (b > 35 && b < 70)){
+      return true;
+    }else{
+      return false;
+    }
+  }
+  else if(g > r * margem && g > b * margem){
     return true;
   }
+
   return false;
 }
 
 bool hasGreen(){
-  //função para ver se tem verde em qualquer um dos sensores
-  if(sensor.getColor() == 3 || sensor2.getColor() == 3 || sensor3.getColor() == 3 || sensor4.getColor() == 3 ){
+  // verifica verde em qualquer sensor
+  if(
+    isGreen(sensor, 1.4)  ||
+    isGreen(sensor2, 1.4) ||
+    isGreen(sensor3, 3)   ||
+    isGreen(sensor4, 1.85)
+ ){
     return true;
   }
-  else{
-    return false;
-  }
+
+  return false;
 }
 
 bool greenLeft(){
-  //função para ver se tem verde em qualquer um dos sensores da esquerda
-  if(sensor3.getColor() == 3 || sensor4.getColor() == 3 ){
+  // verifica verde no lado esquerdo
+  if(
+    isGreen(sensor3, 3)   ||
+    isGreen(sensor4, 1.85)
+  ){
     return true;
   }
-  else{
-    return false;
-  }
+
+  return false;
 }
 
 bool greenRight(){
-  //função para ver se tem verde em qualquer um dos sensores da direita
-  if(sensor.getColor() == 3 || sensor2.getColor() == 3 ){
+  // verifica verde no lado direito
+  if(
+    isGreen(sensor, 1.4)  ||
+    isGreen(sensor2, 1.4)
+  ){
     return true;
   }
-  else{
-    return false;
-  }
+
+  return false;
 }
