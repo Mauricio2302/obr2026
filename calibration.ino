@@ -2,8 +2,8 @@
 void calibrationd(){
 sensor.setBlackMin(3, 10, 3);
 sensor.setBlackMax(100*1.5, 100*1.35, 80*1.15);
-sensor.setGreenMin(0, 100, 0);
-sensor.setGreenMax(50, 255, 50);
+sensor.setGreenMin(18,  40, 18);
+sensor.setGreenMax(30, 55, 30);
 sensor.setRedMin(100, 0, 0);
 sensor.setRedMax(255, 50, 50);
 sensor.setWhiteMin(140*0.9, 140*0.9, 100*0.9);
