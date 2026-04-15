@@ -16,19 +16,21 @@ int colorLM;
 int colorL;
 
 float P;
-int Kp = 45;
+int Kp = 90;
 float error;
-
+//margens de sensores para verde, 1.3, 1.3, 3, 1.8
 void setup() {
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
-
   Serial.begin(9600);
   calibrationd();
 }
 
 void loop() {
+  /*sensor3.getColor();
+  sensor3.printValues();
+  Serial.println(isGreen(sensor3, 3));*/
   followLine();
 }
